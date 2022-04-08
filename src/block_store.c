@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include "bitmap.h"
 #include "block_store.h"
 // include more if you need
@@ -8,13 +9,10 @@
 // remove it before you submit. Just allows things to compile initially.
 #define UNUSED(x) (void)(x)
 
-typedef struct{
-    unsigned char block[BLOCK_SIZE_BYTES];
-} block_t;
 
 //struct block_store block_store_t;
 typedef struct block_store{
-    block_t blocks[BLOCK_STORE_NUM_BLOCKS];
+    char* blocks[BLOCK_STORE_NUM_BLOCKS][BLOCK_SIZE_BYTES];
     bitmap_t *fbm;
 } block_store_t;
 
@@ -112,17 +110,19 @@ size_t block_store_get_total_blocks()
 
 size_t block_store_read(const block_store_t *const bs, const size_t block_id, void *buffer)
 {
-    UNUSED(bs);
-    UNUSED(block_id);
-    UNUSED(buffer);
+    if(bs != NULL && block_id <= BLOCK_STORE_AVAIL_BLOCKS && buffer != NULL){
+        memcpy(buffer, bs->blocks[block_id], BLOCK_SIZE_BYTES);
+        return BLOCK_SIZE_BYTES;
+    }
     return 0;
 }
 
 size_t block_store_write(block_store_t *const bs, const size_t block_id, const void *buffer)
 {
-    UNUSED(bs);
-    UNUSED(block_id);
-    UNUSED(buffer);
+    if(bs != NULL && block_id <= BLOCK_STORE_AVAIL_BLOCKS && buffer != NULL){
+        memcpy(bs->blocks[block_id], buffer, BLOCK_SIZE_BYTES);
+        return BLOCK_SIZE_BYTES;
+    }
     return 0;
 }
 
