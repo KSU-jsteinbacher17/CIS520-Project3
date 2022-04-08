@@ -100,14 +100,14 @@ size_t block_store_get_used_blocks(const block_store_t *const bs)
 size_t block_store_get_free_blocks(const block_store_t *const bs)
 {
     if(bs != NULL){
-        return (BLOCK_STORE_AVAIL_BLOCKS - 1) - bitmap_total_set(bs->fbm);
+        return (BLOCK_STORE_AVAIL_BLOCKS) - bitmap_total_set(bs->fbm);
     }
     else { return SIZE_MAX; }
 }
 
 size_t block_store_get_total_blocks()
 {
-    return BLOCK_STORE_AVAIL_BLOCKS-1;
+    return BLOCK_STORE_AVAIL_BLOCKS;
 }
 
 size_t block_store_read(const block_store_t *const bs, const size_t block_id, void *buffer)
