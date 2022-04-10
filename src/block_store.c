@@ -26,7 +26,10 @@ typedef struct block_store{
     bitmap_t *fbm;
 } block_store_t;*/
 
-
+///
+/// This creates a new BS device, ready to go
+/// \return Pointer to a new block storage device, NULL on error
+///
 block_store_t *block_store_create()
 {
     // block index where the fbm bitmap starts
@@ -49,6 +52,11 @@ block_store_t *block_store_create()
     return bs;
 }
 
+///
+/// Destroys the provided block storage device
+/// This is an idempotent operation, so there is no return value
+/// \param bs BS device
+///
 void block_store_destroy(block_store_t *const bs)
 {
     if(bs != NULL){
@@ -56,6 +64,12 @@ void block_store_destroy(block_store_t *const bs)
         free(bs);
     }
 }
+
+///
+/// Searches for a free block, marks it as in use, and returns the block's id
+/// \param bs BS device
+/// \return Allocated block's id, SIZE_MAX on error
+///
 size_t block_store_allocate(block_store_t *const bs)
 {
     if(bs == NULL){
@@ -72,6 +86,12 @@ size_t block_store_allocate(block_store_t *const bs)
     return id;
 }
 
+///
+/// Attempts to allocate the requested block id
+/// \param bs the block store object
+/// \block_id the requested block identifier
+/// \return boolean indicating succes of operation
+///
 bool block_store_request(block_store_t *const bs, const size_t block_id)
 {
     //check for bad parameters, block id is equal to the block index
@@ -87,6 +107,11 @@ bool block_store_request(block_store_t *const bs, const size_t block_id)
     return true;
 }
 
+///
+/// Frees the specified block
+/// \param bs BS device
+/// \param block_id The block to free
+///
 void block_store_release(block_store_t *const bs, const size_t block_id)
 {
     if((bs != NULL) && (block_id <= BLOCK_STORE_AVAIL_BLOCKS)){
@@ -95,6 +120,11 @@ void block_store_release(block_store_t *const bs, const size_t block_id)
     }
 }
 
+///
+/// Counts the number of blocks marked as in use
+/// \param bs BS device
+/// \return Total blocks in use, SIZE_MAX on error
+///
 size_t block_store_get_used_blocks(const block_store_t *const bs)
 {
     if(bs != NULL){
@@ -103,6 +133,11 @@ size_t block_store_get_used_blocks(const block_store_t *const bs)
     else { return SIZE_MAX; }
 }
 
+///
+/// Counts the number of blocks marked free for use
+/// \param bs BS device
+/// \return Total blocks free, SIZE_MAX on error
+///
 size_t block_store_get_free_blocks(const block_store_t *const bs)
 {
     if(bs != NULL){
@@ -112,11 +147,23 @@ size_t block_store_get_free_blocks(const block_store_t *const bs)
     else { return SIZE_MAX; }
 }
 
+///
+/// Returns the total number of user-addressable blocks
+///  (since this is constant, you don't even need the bs object)
+/// \return Total blocks
+///
 size_t block_store_get_total_blocks()
 {
     return BLOCK_STORE_AVAIL_BLOCKS;
 }
 
+///
+/// Reads data from the specified block and writes it to the designated buffer
+/// \param bs BS device
+/// \param block_id Source block id
+/// \param buffer Data buffer to write to
+/// \return Number of bytes read, 0 on error
+///
 size_t block_store_read(const block_store_t *const bs, const size_t block_id, void *buffer)
 {
     if((bs != NULL) && (block_id < BLOCK_STORE_NUM_BLOCKS) && (buffer != NULL)){
@@ -127,6 +174,13 @@ size_t block_store_read(const block_store_t *const bs, const size_t block_id, vo
     return 0;
 }
 
+///
+/// Reads data from the specified buffer and writes it to the designated block
+/// \param bs BS device
+/// \param block_id Destination block id
+/// \param buffer Data buffer to read from
+/// \return Number of bytes written, 0 on error
+///
 size_t block_store_write(block_store_t *const bs, const size_t block_id, const void *buffer)
 {
     if((bs != NULL) && (block_id < BLOCK_STORE_NUM_BLOCKS) && (buffer != NULL)){
@@ -137,6 +191,11 @@ size_t block_store_write(block_store_t *const bs, const size_t block_id, const v
     return 0;
 }
 
+///
+/// Imports BS device from the given file - for grads/bonus
+/// \param filename The file to load
+/// \return Pointer to new BS device, NULL on error
+///
 block_store_t *block_store_deserialize(const char *const filename)
 {
     if(filename == NULL){
@@ -160,6 +219,12 @@ block_store_t *block_store_deserialize(const char *const filename)
     return bs;
 }
 
+///
+/// Writes the entirety of the BS device to file, overwriting it if it exists - for grads/bonus
+/// \param bs BS device
+/// \param filename The file to write to
+/// \return Number of bytes written, 0 on error
+///
 size_t block_store_serialize(const block_store_t *const bs, const char *const filename)
 {
     if(filename == NULL){
